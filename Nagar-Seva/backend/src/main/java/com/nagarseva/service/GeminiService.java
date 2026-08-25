@@ -647,4 +647,222 @@ public class GeminiService {
         res.put("priority", priority);
         return res;
     }
+
+    public record PatientTriageResult(
+            String recommendedDepartment,
+            String urgency,
+            String clinicalRationale,
+            int estimatedWaitMinutes,
+            String redFlagAdvice,
+            boolean requiresImmediateCmo
+    ) {}
+
+    /**
+     * AI Symptom-to-Department Triage using Gemini grounded in patient self-told symptoms
+     */
+    public PatientTriageResult triagePatientSymptom(String selfToldCondition) {
+        if (apiKey == null || apiKey.isBlank()) {
+            return fallbackPatientTriage(selfToldCondition);
+        }
+
+        try {
+            String prompt = """
+                You are the Chief Triage AI Assistant for a premier multi-specialty hospital.
+                A patient has described their condition in their own layman words:
+                "%s"
+
+                Evaluate the patient's symptoms and classify the appropriate medical department.
+                Available departments:
+                - PSYCHIATRY (Anxiety, depression, mood changes, hallucinations, panic, insomnia, stress, trauma, burnout, self-harm concerns)
+                - RADIOLOGY (Severe physical trauma, head injury, bone fractures requiring scans/X-Ray/CT/MRI, acute internal pain)
+                - CARDIOLOGY (Chest pressure, tightness, left arm pain, palpitations, shortness of breath, hypertension)
+                - ORTHOPEDICS (Joint pain, sprains, sports injury, back pain, bone alignment, swelling in limbs)
+                - GENERAL_MEDICINE (Fever, fatigue, seasonal infection, weakness, digestion, general malaise)
+                - PEDIATRICS (Child health, developmental issues, childhood fevers, vaccination)
+                - DERMATOLOGY (Rashes, skin lesions, itching, allergic reactions, acne)
+                - ENT (Ear pain, throat infection, hearing loss, sinus congestion, vertigo)
+                - NEUROLOGY (Severe migraine, seizures, numbness, speech difficulties, tremors)
+                - EMERGENCY_CARE (Active bleeding, severe breathlessness, unconsciousness, shock)
+
+                Return ONLY a valid JSON object with:
+                {
+                  "recommendedDepartment": "PSYCHIATRY" | "RADIOLOGY" | "CARDIOLOGY" | "ORTHOPEDICS" | "GENERAL_MEDICINE" | "PEDIATRICS" | "DERMATOLOGY" | "ENT" | "NEUROLOGY" | "EMERGENCY_CARE",
+                  "urgency": "CRITICAL" | "URGENT" | "ROUTINE",
+                  "clinicalRationale": "Short 2-3 sentence clinical explanation of why this department is best suited.",
+                  "estimatedWaitMinutes": 10 | 15 | 25 | 40,
+                  "redFlagAdvice": "Immediate precautionary guidance for the patient before doctor arrival.",
+                  "requiresImmediateCmo": true | false
+                }
+                """.formatted(selfToldCondition);
+
+            HttpPost request = new HttpPost(GEMINI_BASE_URL + model + ":generateContent?key=" + apiKey);
+            request.setHeader("Content-Type", "application/json");
+
+            ObjectNode rootNode = objectMapper.createObjectNode();
+            ArrayNode contents = rootNode.putArray("contents");
+            ObjectNode contentObj = contents.addObject();
+            ArrayNode parts = contentObj.putArray("parts");
+            parts.addObject().put("text", prompt);
+
+            request.setEntity(new StringEntity(objectMapper.writeValueAsString(rootNode), ContentType.APPLICATION_JSON));
+
+            try (var response = httpClient.execute(request)) {
+                String responseBody = EntityUtils.toString(response.getEntity());
+                JsonNode jsonResponse = objectMapper.readTree(responseBody);
+                JsonNode candidates = jsonResponse.path("candidates");
+
+                if (candidates.isArray() && !candidates.isEmpty()) {
+                    String rawText = candidates.get(0).path("content").path("parts").get(0).path("text").asText();
+                    String cleanJson = rawText.replaceAll("```json", "").replaceAll("```", "").trim();
+                    JsonNode triageJson = objectMapper.readTree(cleanJson);
+
+                    String dept = triageJson.path("recommendedDepartment").asText("GENERAL_MEDICINE");
+                    String urgency = triageJson.path("urgency").asText("ROUTINE");
+                    String rationale = triageJson.path("clinicalRationale").asText("Patient routed based on reported symptom cluster.");
+                    int waitMinutes = triageJson.path("estimatedWaitMinutes").asInt(15);
+                    String advice = triageJson.path("redFlagAdvice").asText("Please stay seated and inform the nurse if symptoms escalate.");
+                    boolean cmo = triageJson.path("requiresImmediateCmo").asBoolean(false);
+
+                    return new PatientTriageResult(dept, urgency, rationale, waitMinutes, advice, cmo);
+                }
+            }
+        } catch (Exception e) {
+            log.warn("Gemini patient triage API error, using intelligent clinical fallback: {}", e.getMessage());
+        }
+
+        return fallbackPatientTriage(selfToldCondition);
+    }
+
+    private PatientTriageResult fallbackPatientTriage(String selfToldCondition) {
+        String lower = (selfToldCondition != null ? selfToldCondition : "").toLowerCase();
+
+        if (lower.contains("depress") || lower.contains("anxiety") || lower.contains("mental") || lower.contains("suicid") ||
+            lower.contains("hallucinat") || lower.contains("hopeless") || lower.contains("sleep") || lower.contains("insomnia") ||
+            lower.contains("panic") || lower.contains("stress") || lower.contains("mood") || lower.contains("bipolar")) {
+            return new PatientTriageResult(
+                    "PSYCHIATRY",
+                    lower.contains("suicid") || lower.contains("panic") ? "URGENT" : "ROUTINE",
+                    "Patient reported emotional, psychiatric, or sleep-cycle distress. Direct consultation with the Psychiatric & Behavioral Health Department is advised.",
+                    15,
+                    "Take calm deep breaths in a quiet seating zone. A psychiatric consulting doctor has been allocated to your session.",
+                    lower.contains("suicid")
+            );
+        }
+
+        if (lower.contains("x-ray") || lower.contains("mri") || lower.contains("scan") || lower.contains("ct scan") ||
+            lower.contains("fracture") || lower.contains("bone broken") || lower.contains("head injury") || lower.contains("internal bleeding")) {
+            return new PatientTriageResult(
+                    "RADIOLOGY",
+                    "URGENT",
+                    "Symptoms indicate acute physical injury or deep structural trauma requiring diagnostic imaging.",
+                    10,
+                    "Keep the injured area strictly immobilized. Do not bear weight until radiological imaging is concluded.",
+                    false
+            );
+        }
+
+        if (lower.contains("chest") || lower.contains("heart") || lower.contains("palpitat") || lower.contains("angina") ||
+            lower.contains("breathless") || lower.contains("left arm")) {
+            return new PatientTriageResult(
+                    "CARDIOLOGY",
+                    "CRITICAL",
+                    "Cardiovascular warning indicators detected. Immediate priority ECG & Cardiology assessment is indicated.",
+                    5,
+                    "Remain completely stationary in a seated posture. Medical response staff has been flagged.",
+                    true
+            );
+        }
+
+        if (lower.contains("joint") || lower.contains("knee") || lower.contains("ankle") || lower.contains("back pain") ||
+            lower.contains("spine") || lower.contains("sprain") || lower.contains("ligament")) {
+            return new PatientTriageResult(
+                    "ORTHOPEDICS",
+                    "ROUTINE",
+                    "Musculoskeletal indicators detected. Evaluation by Orthopedic and Joint Care team is recommended.",
+                    20,
+                    "Avoid strenuous motion or repetitive joint bending.",
+                    false
+            );
+        }
+
+        if (lower.contains("rash") || lower.contains("skin") || lower.contains("itch") || lower.contains("allergy") || lower.contains("eczema")) {
+            return new PatientTriageResult(
+                    "DERMATOLOGY",
+                    "ROUTINE",
+                    "Dermatological presentation detected. Consultation with Department of Dermatology scheduled.",
+                    25,
+                    "Avoid scratching or applying unprescribed topical ointments.",
+                    false
+            );
+        }
+
+        if (lower.contains("ear") || lower.contains("throat") || lower.contains("sinus") || lower.contains("nose") || lower.contains("hearing") || lower.contains("vertigo")) {
+            return new PatientTriageResult(
+                    "ENT",
+                    "ROUTINE",
+                    "Ear, nose, and throat indicators detected. Assigned to ENT specialty clinic.",
+                    20,
+                    "Stay hydrated and avoid exposure to dusty environments.",
+                    false
+            );
+        }
+
+        return new PatientTriageResult(
+                "GENERAL_MEDICINE",
+                "ROUTINE",
+                "General physiological symptoms detected. Primary assessment by General Medicine Physician will triage or treat directly.",
+                15,
+                "Please have your previous medical records or ongoing prescriptions ready for the attending physician.",
+                false
+        );
+    }
+
+    /**
+     * Generate an automated SBAR clinical handover briefing for zero-resistance doctor transfer
+     */
+    public String generateCaseHandoverSummary(String patientName, int age, String chiefComplaint, String diagnosis, String vitals, String fromDept, String toDept, String reason) {
+        if (apiKey != null && !apiKey.isBlank()) {
+            try {
+                String prompt = """
+                    You are a Senior Clinical Coordinator generating a zero-resistance SBAR (Situation, Background, Assessment, Recommendation) medical case handover briefing.
+                    Patient: %s, Age: %d
+                    From Department: %s -> To Department: %s
+                    Chief Complaint: %s
+                    Clinical Diagnosis / Findings: %s
+                    Vitals: %s
+                    Reason for Handover: %s
+
+                    Generate a concise, professional 3-4 sentence clinical briefing for the receiving specialist so they can take over with zero resistance and no redundant questioning.
+                    """.formatted(patientName, age, fromDept, toDept, chiefComplaint, diagnosis, vitals, reason);
+
+                HttpPost request = new HttpPost(GEMINI_BASE_URL + model + ":generateContent?key=" + apiKey);
+                request.setHeader("Content-Type", "application/json");
+
+                ObjectNode rootNode = objectMapper.createObjectNode();
+                ArrayNode contents = rootNode.putArray("contents");
+                ObjectNode contentObj = contents.addObject();
+                ArrayNode parts = contentObj.putArray("parts");
+                parts.addObject().put("text", prompt);
+
+                request.setEntity(new StringEntity(objectMapper.writeValueAsString(rootNode), ContentType.APPLICATION_JSON));
+
+                try (var response = httpClient.execute(request)) {
+                    String responseBody = EntityUtils.toString(response.getEntity());
+                    JsonNode jsonResponse = objectMapper.readTree(responseBody);
+                    JsonNode candidates = jsonResponse.path("candidates");
+
+                    if (candidates.isArray() && !candidates.isEmpty()) {
+                        return candidates.get(0).path("content").path("parts").get(0).path("text").asText().trim();
+                    }
+                }
+            } catch (Exception e) {
+                log.warn("Gemini clinical handover summary error: {}", e.getMessage());
+            }
+        }
+
+        return String.format(
+                "CLINICAL HANDOVER (SBAR): Patient %s (Age: %d) transferred from %s to %s. Reason: %s. Current presentation: %s with working diagnosis: %s. Vitals stable (%s). Receiving doctor may proceed directly with specialized intervention.",
+                patientName, age, fromDept, toDept, reason, chiefComplaint, diagnosis != null ? diagnosis : "Pending Specialist Review", vitals != null ? vitals : "BP/Pulse recorded"
+        );
+    }
 }

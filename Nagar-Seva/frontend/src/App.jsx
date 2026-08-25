@@ -10,6 +10,10 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import MyComplaints from './pages/MyComplaints';
 import AdminPanel from './pages/AdminPanel';
+import OpdTriage from './pages/OpdTriage';
+import DoctorWorkbench from './pages/DoctorWorkbench';
+import PatientVault from './pages/PatientVault';
+import HospitalOperations from './pages/HospitalOperations';
 import './styles/index.css';
 
 function PrivateRoute({ children, allowedRoles }) {
@@ -105,6 +109,33 @@ export default function App() {
           <Route path="/track" element={
             <Layout>
               <TrackComplaints />
+            </Layout>
+          } />
+
+          {/* Healthcare & Clinical System Routes */}
+          <Route path="/opd-triage" element={
+            <Layout>
+              <OpdTriage />
+            </Layout>
+          } />
+
+          <Route path="/health" element={<Navigate to="/opd-triage" replace />} />
+
+          <Route path="/doctor-workbench" element={
+            <Layout>
+              <DoctorWorkbench />
+            </Layout>
+          } />
+
+          <Route path="/health-vault" element={
+            <Layout>
+              <PatientVault />
+            </Layout>
+          } />
+
+          <Route path="/hospital-ops" element={
+            <Layout>
+              <HospitalOperations />
             </Layout>
           } />
 

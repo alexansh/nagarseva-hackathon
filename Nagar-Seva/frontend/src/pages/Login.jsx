@@ -313,30 +313,87 @@ export default function Login() {
             </div>
           </form>
 
-          {/* Quick 1-Click Department Logins */}
-          <div className="mt-6 pt-5 border-t border-gray-100">
-            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2.5 text-center">
-              ⚡ 1-Click Department Official Logins
-            </p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
-              {MUNICIPAL_DEPARTMENTS.slice(0, 6).map((dept) => (
+          {/* Quick 1-Click Department & Doctor Logins */}
+          <div className="mt-6 pt-5 border-t border-gray-100 space-y-4">
+            <div>
+              <p className="text-[11px] font-bold text-violet-700 uppercase tracking-wider mb-2 text-center">
+                🩺 1-Click Medical & Doctor Official Logins
+              </p>
+              <div className="grid grid-cols-2 gap-1.5">
                 <button
-                  key={dept.id}
                   type="button"
-                  onClick={() => handleQuickDemo(dept)}
-                  className={`p-2 rounded-xl border text-[11px] font-semibold text-left transition flex items-center gap-1.5 ${
-                    selectedRole === 'ADMIN' && selectedDepartment === dept.name
-                      ? 'bg-violet-50 border-[#7c5cff] text-[#7c5cff] shadow-xs'
-                      : 'bg-gray-50 border-gray-200/80 hover:bg-gray-100 text-gray-700'
-                  }`}
+                  onClick={() => {
+                    loginLocalDemo('ADMIN', 'doctor.psychiatry@nagarseva.gov.in', 'Dr. Ananya Roy (MD Psychiatry)', 'Psychiatry & Behavioral Health');
+                    navigate('/doctor-workbench');
+                  }}
+                  className="p-2 bg-violet-50 hover:bg-violet-100 border border-violet-200 rounded-xl text-[11px] font-bold text-violet-900 text-left transition flex items-center gap-1.5"
                 >
-                  <span className="text-sm">{dept.icon}</span>
-                  <span className="truncate">{dept.category}</span>
+                  <span>🧠</span>
+                  <span className="truncate">Dr. Ananya Roy (Psychiatry)</span>
                 </button>
-              ))}
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    loginLocalDemo('ADMIN', 'doctor.radiology@nagarseva.gov.in', 'Dr. Vikram Malhotra (MD Radiology)', 'Radiology & Imaging');
+                    navigate('/doctor-workbench');
+                  }}
+                  className="p-2 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-xl text-[11px] font-bold text-indigo-900 text-left transition flex items-center gap-1.5"
+                >
+                  <span>🩻</span>
+                  <span className="truncate">Dr. Vikram (Radiology)</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    loginLocalDemo('ADMIN', 'cmo.officer@nagarseva.gov.in', 'Dr. Priya Nambiar (CMO)', 'Emergency & Trauma Care');
+                    navigate('/hospital-ops');
+                  }}
+                  className="p-2 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-xl text-[11px] font-bold text-amber-900 text-left transition flex items-center gap-1.5"
+                >
+                  <span>🚨</span>
+                  <span className="truncate">Dr. Priya (Chief Medical Officer)</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    loginLocalDemo('CITIZEN', 'patient@nagarseva.com', 'Sneha Kapoor (Patient)', null);
+                    navigate('/health-vault');
+                  }}
+                  className="p-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl text-[11px] font-bold text-emerald-900 text-left transition flex items-center gap-1.5"
+                >
+                  <span>📁</span>
+                  <span className="truncate">Sneha Kapoor (Patient Vault)</span>
+                </button>
+              </div>
             </div>
 
-            <div className="mt-2 text-center">
+            <div>
+              <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2 text-center">
+                🏛️ 1-Click Municipal Department Officials
+              </p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
+                {MUNICIPAL_DEPARTMENTS.slice(0, 6).map((dept) => (
+                  <button
+                    key={dept.id}
+                    type="button"
+                    onClick={() => handleQuickDemo(dept)}
+                    className={`p-2 rounded-xl border text-[11px] font-semibold text-left transition flex items-center gap-1.5 ${
+                      selectedRole === 'ADMIN' && selectedDepartment === dept.name
+                        ? 'bg-violet-50 border-[#7c5cff] text-[#7c5cff] shadow-xs'
+                        : 'bg-gray-50 border-gray-200/80 hover:bg-gray-100 text-gray-700'
+                    }`}
+                  >
+                    <span className="text-sm">{dept.icon}</span>
+                    <span className="truncate">{dept.category}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="text-center">
               <button
                 type="button"
                 onClick={handleCitizenDemo}
@@ -350,7 +407,7 @@ export default function Login() {
           <div className="mt-5 text-center text-xs text-gray-500">
             Don't have an official account?{' '}
             <Link to="/register" className="font-bold text-[#7c5cff] hover:underline">
-              Register New Authority / Citizen
+              Register New Authority / Doctor / Citizen
             </Link>
           </div>
         </div>

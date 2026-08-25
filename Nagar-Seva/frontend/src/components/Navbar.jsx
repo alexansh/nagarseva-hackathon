@@ -41,12 +41,26 @@ export default function Navbar() {
         </Link>
 
         {/* Center Pill Nav Links */}
-        <div className="hidden md:flex items-center gap-1 bg-gray-50/80 p-1 rounded-full border border-gray-100">
+        <div className="hidden md:flex items-center gap-1 bg-gray-50/80 p-1 rounded-full border border-gray-100 overflow-x-auto max-w-2xl">
           <Link to="/dashboard" className={navPillClass('/dashboard')}>
             Dashboard
           </Link>
           <Link to="/safety" className={navPillClass('/safety')}>
             Safety Map
+          </Link>
+
+          {/* Clinical Suite */}
+          <Link to="/opd-triage" className={navPillClass('/opd-triage')}>
+            🩺 OPD Triage
+          </Link>
+          <Link to="/doctor-workbench" className={navPillClass('/doctor-workbench')}>
+            👨‍⚕️ Doctor Portal
+          </Link>
+          <Link to="/health-vault" className={navPillClass('/health-vault')}>
+            📁 Health Vault
+          </Link>
+          <Link to="/hospital-ops" className={navPillClass('/hospital-ops')}>
+            🏥 Hospital Ops
           </Link>
 
           {user && (
@@ -125,6 +139,18 @@ export default function Navbar() {
         </Link>
         <Link to="/safety" className={navPillClass('/safety')}>
           Safety
+        </Link>
+        <Link to="/opd-triage" className={navPillClass('/opd-triage')}>
+          OPD
+        </Link>
+        <Link to="/doctor-workbench" className={navPillClass('/doctor-workbench')}>
+          Doctor
+        </Link>
+        <Link to="/health-vault" className={navPillClass('/health-vault')}>
+          Vault
+        </Link>
+        <Link to="/hospital-ops" className={navPillClass('/hospital-ops')}>
+          Hospital
         </Link>
         {user && (
           <>
