@@ -46,7 +46,7 @@ public class Complaint {
     @Column
     private String photoUrl;
 
-    @Column(columnDefinition = "LONGTEXT")
+    @Column(columnDefinition = "TEXT")
     private String photoData;
 
     // Object storage keys (for S3/MinIO migration)
