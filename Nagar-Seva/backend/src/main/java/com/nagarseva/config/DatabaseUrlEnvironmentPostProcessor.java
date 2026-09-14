@@ -10,13 +10,17 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * Automatically detects and normalizes cloud database connection strings (Render, Railway, Heroku, Supabase, Neon)
  * converting 'postgres://user:password@host:port/dbname' or 'postgresql://...' into standard JDBC format:
  * 'jdbc:postgresql://host:port/dbname?sslmode=require' with extracted credentials.
+ * Also loads local .env files into the Spring environment for seamless local development.
  */
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class DatabaseUrlEnvironmentPostProcessor implements EnvironmentPostProcessor {
@@ -25,6 +29,9 @@ public class DatabaseUrlEnvironmentPostProcessor implements EnvironmentPostProce
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
+        // Load local .env files if present (without committing secrets to git)
+        loadLocalDotEnv(environment);
+
         String rawUrl = environment.getProperty("DATABASE_URL");
         if (rawUrl == null || rawUrl.isBlank()) {
             rawUrl = System.getenv("DATABASE_URL");
@@ -96,6 +103,44 @@ public class DatabaseUrlEnvironmentPostProcessor implements EnvironmentPostProce
             }
         } catch (Exception e) {
             log.warn("Could not normalize cloud DATABASE_URL '{}': {}", rawUrl, e.getMessage());
+        }
+    }
+
+    private void loadLocalDotEnv(ConfigurableEnvironment environment) {
+        Path[] candidatePaths = new Path[]{
+                Path.of(".env"),
+                Path.of("../.env"),
+                Path.of("../../.env")
+        };
+
+        for (Path path : candidatePaths) {
+            if (Files.exists(path) && !Files.isDirectory(path)) {
+                try {
+                    List<String> lines = Files.readAllLines(path);
+                    Map<String, Object> envMap = new HashMap<>();
+                    for (String line : lines) {
+                        line = line.trim();
+                        if (!line.isEmpty() && !line.startsWith("#") && line.contains("=")) {
+                            int eq = line.indexOf('=');
+                            String key = line.substring(0, eq).trim();
+                            String val = line.substring(eq + 1).trim();
+                            if (val.startsWith("\"") && val.endsWith("\"") && val.length() >= 2) {
+                                val = val.substring(1, val.length() - 1);
+                            } else if (val.startsWith("'") && val.endsWith("'") && val.length() >= 2) {
+                                val = val.substring(1, val.length() - 1);
+                            }
+                            envMap.put(key, val);
+                        }
+                    }
+                    if (!envMap.isEmpty()) {
+                        environment.getPropertySources().addLast(new MapPropertySource("localDotEnvFile:" + path, envMap));
+                        log.info("Loaded {} environment variables from local {}", envMap.size(), path);
+                        return;
+                    }
+                } catch (Exception e) {
+                    log.debug("Could not parse env file at {}: {}", path, e.getMessage());
+                }
+            }
         }
     }
 }
