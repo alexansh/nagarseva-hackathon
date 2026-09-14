@@ -736,22 +736,24 @@ function SafetyMap() {
           {/* Route Safety Intelligence Card */}
           {routeInfo && (
             <div className={`rounded-3xl p-5 shadow-card dark:shadow-none border transition-all ${
-              routeInfo.safe ? 'bg-emerald-50/70 border-emerald-200/70' : 'bg-amber-50/70 border-amber-200/70'
+              routeInfo.safe 
+                ? 'bg-emerald-50/70 border-emerald-200/70 dark:bg-emerald-950/40 dark:border-emerald-800/60' 
+                : 'bg-amber-50/70 border-amber-200/70 dark:bg-amber-950/40 dark:border-amber-800/60'
             }`}>
               <div className="flex items-start gap-3">
                 <span className="text-2xl mt-0.5">
                   {routeInfo.safe ? '🛡️' : '⚠️'}
                 </span>
                 <div className="flex-1">
-                  <h3 className={`text-sm font-bold ${routeInfo.safe ? 'text-emerald-900' : 'text-amber-900'}`}>
+                  <h3 className={`text-sm font-bold ${routeInfo.safe ? 'text-emerald-900 dark:text-emerald-200' : 'text-amber-900 dark:text-amber-200'}`}>
                     {routeInfo.safe ? 'Safe Road Corridor' : 'Safety Advisory on Real Route'}
                   </h3>
-                  <p className={`text-xs mt-1 ${routeInfo.safe ? 'text-emerald-700' : 'text-amber-800'}`}>
+                  <p className={`text-xs mt-1 ${routeInfo.safe ? 'text-emerald-700 dark:text-emerald-300' : 'text-amber-800 dark:text-amber-300'}`}>
                     {routeInfo.message}
                   </p>
 
                   {/* Route Navigation Metrics */}
-                  <div className="flex gap-4 mt-3 pt-3 border-t border-black/5">
+                  <div className="flex gap-4 mt-3 pt-3 border-t border-black/5 dark:border-white/10">
                     <div>
                       <span className="text-[10px] uppercase font-bold text-gray-400">Road Distance</span>
                       <p className="text-sm font-black text-gray-900 dark:text-gray-100">{routeInfo.distanceKm} km</p>
@@ -762,7 +764,7 @@ function SafetyMap() {
                     </div>
                     <div>
                       <span className="text-[10px] uppercase font-bold text-gray-400">Status</span>
-                      <p className={`text-sm font-black ${routeInfo.safe ? 'text-emerald-600' : 'text-amber-600'}`}>
+                      <p className={`text-sm font-black ${routeInfo.safe ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}`}>
                         {routeInfo.safe ? 'Verified Safe' : `${routeInfo.riskyLocations.length} Incident(s)`}
                       </p>
                     </div>
@@ -770,17 +772,17 @@ function SafetyMap() {
 
                   {/* Risky Areas Details */}
                   {routeInfo.riskyLocations && routeInfo.riskyLocations.length > 0 && (
-                    <div className="mt-3 pt-3 border-t border-amber-200/60 space-y-1.5">
-                      <p className="text-[11px] font-bold text-amber-900">
+                    <div className="mt-3 pt-3 border-t border-amber-200/60 dark:border-amber-800/60 space-y-1.5">
+                      <p className="text-[11px] font-bold text-amber-900 dark:text-amber-300">
                         Nearby Incidents along Road:
                       </p>
                       {routeInfo.riskyLocations.map((loc, idx) => (
-                        <div key={idx} className="bg-white dark:bg-gray-800/80 p-2 rounded-xl border border-amber-200 text-xs text-gray-700 dark:text-gray-300 flex items-center justify-between">
+                        <div key={idx} className="bg-white/80 dark:bg-gray-800/80 p-2 rounded-xl border border-amber-200 dark:border-amber-800/60 text-xs text-gray-700 dark:text-gray-300 flex items-center justify-between">
                           <div>
                             <span className="font-bold text-gray-900 dark:text-gray-100">{loc.category}</span>
                             <span className="text-gray-500 dark:text-gray-400"> • {loc.location}</span>
                           </div>
-                          <span className="px-2 py-0.5 text-[10px] font-bold bg-amber-100 text-amber-800 rounded-full">
+                          <span className="px-2 py-0.5 text-[10px] font-bold bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 rounded-full">
                             {loc.timeOfDay}
                           </span>
                         </div>

@@ -525,18 +525,18 @@ export default function ReportIssue() {
           </div>
 
           {/* Email & Reminder Notification Confirmation */}
-          <div className="bg-white dark:bg-gray-800/80 rounded-2xl p-3 border border-emerald-200/80 text-xs space-y-1.5">
-            <div className="flex items-center gap-2 text-emerald-900 font-bold">
+          <div className="bg-white/80 dark:bg-gray-800/80 rounded-2xl p-3 border border-emerald-200/80 dark:border-emerald-800/60 text-xs space-y-1.5">
+            <div className="flex items-center gap-2 text-emerald-900 dark:text-emerald-200 font-bold">
               <span>📧</span>
               <span>Official Department Dispatch Sent: {submittedTicket.routedAuthority || 'Department Officer'}</span>
             </div>
-            <div className="flex items-center gap-2 text-emerald-800 text-[11px]">
+            <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-300 text-[11px]">
               <span>🔔</span>
               <span>Automated Monitoring Active: Both you and the department will receive periodic status updates until this issue is fixed.</span>
             </div>
           </div>
           
-          <div className="pt-2 border-t border-emerald-200/80 flex flex-wrap items-center gap-3">
+          <div className="pt-2 border-t border-emerald-200/80 dark:border-emerald-800/60 flex flex-wrap items-center gap-3">
             <Link
               to="/my-complaints"
               className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl shadow-xs transition"
@@ -545,7 +545,7 @@ export default function ReportIssue() {
             </Link>
             <Link
               to="/track"
-              className="px-4 py-2 bg-white dark:bg-gray-800 hover:bg-emerald-100 text-emerald-800 text-xs font-bold rounded-xl border border-emerald-300 transition"
+              className="px-4 py-2 bg-white dark:bg-gray-800 hover:bg-emerald-100 dark:hover:bg-gray-700 text-emerald-800 dark:text-emerald-300 text-xs font-bold rounded-xl border border-emerald-300 dark:border-emerald-700 transition"
             >
               Track on Public Registry 🔍
             </Link>
@@ -574,8 +574,8 @@ export default function ReportIssue() {
                   }}
                   className={`p-3 rounded-2xl text-xs font-bold transition flex items-center gap-2 border ${
                     formData.category === cat.label
-                      ? 'bg-violet-50 border-violet-500 text-violet-700 shadow-xs'
-                      : 'bg-gray-50 dark:bg-gray-900/80 border-gray-100 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100'
+                      ? 'bg-violet-50 dark:bg-violet-950/60 border-violet-500 text-violet-700 dark:text-violet-300 shadow-xs'
+                      : 'bg-gray-50 dark:bg-gray-900/80 border-gray-100 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                   }`}
                 >
                   <span className="text-base">{cat.icon}</span>
@@ -758,9 +758,9 @@ export default function ReportIssue() {
                 </Marker>
               </MapContainer>
 
-              <div className="absolute bottom-3 left-3 right-3 z-[400] bg-white dark:bg-gray-800/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700/80 text-[11px] font-semibold text-gray-700 dark:text-gray-300 flex items-center justify-between shadow-xs">
+              <div className="absolute bottom-3 left-3 right-3 z-[400] bg-white/90 dark:bg-gray-800/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700/80 text-[11px] font-semibold text-gray-700 dark:text-gray-300 flex items-center justify-between shadow-xs">
                 <span>📍 <strong>Pinned:</strong> {formData.location ? formData.location.slice(0, 45) + (formData.location.length > 45 ? '...' : '') : 'Click on map to choose spot'}</span>
-                <span className="text-violet-700 font-extrabold uppercase">{formData.ward}</span>
+                <span className="text-violet-700 dark:text-violet-400 font-extrabold uppercase">{formData.ward}</span>
               </div>
             </div>
           </div>
@@ -775,14 +775,14 @@ export default function ReportIssue() {
                 <button
                   type="button"
                   onClick={handleRemovePhoto}
-                  className="text-xs font-bold text-rose-600 dark:text-rose-400 hover:text-rose-800 transition"
+                  className="text-xs font-bold text-rose-600 dark:text-rose-400 hover:text-rose-800 dark:hover:text-rose-300 transition"
                 >
                   ✕ Remove Photo
                 </button>
               )}
             </div>
             <div
-              className="p-4 bg-gray-50 dark:bg-gray-900 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-2xl text-center hover:bg-gray-100/80 transition cursor-pointer"
+              className="p-4 bg-gray-50 dark:bg-gray-900 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-2xl text-center hover:bg-gray-100/80 dark:hover:bg-gray-800/80 transition cursor-pointer"
               onClick={() => fileInputRef.current?.click()}
             >
               <input
@@ -797,36 +797,36 @@ export default function ReportIssue() {
                   <img
                     src={photoPreview}
                     alt="Preview"
-                    className="max-h-48 rounded-xl object-contain shadow-xs mb-2 border border-gray-200"
+                    className="max-h-48 rounded-xl object-contain shadow-xs mb-2 border border-gray-200 dark:border-gray-700"
                   />
-                  <p className="text-xs font-bold text-violet-600">Click to choose a different photo</p>
+                  <p className="text-xs font-bold text-violet-600 dark:text-violet-400">Click to choose a different photo</p>
                 </div>
               ) : (
                 <div className="py-4">
                   <span className="text-2xl mb-1 block">📷</span>
                   <p className="text-xs font-bold text-gray-700 dark:text-gray-300">Click to upload photo evidence</p>
                   <p className="text-[11px] text-gray-400 mt-0.5">Supports PNG, JPG, JPEG (Max 2MB)</p>
-                  <p className="text-[10px] text-violet-600 font-semibold mt-1">✨ Scanned by Gemini AI Vision for civic defect verification</p>
+                  <p className="text-[10px] text-violet-600 dark:text-violet-400 font-semibold mt-1">✨ Scanned by Gemini AI Vision for civic defect verification</p>
                 </div>
               )}
             </div>
 
             {/* AI Vision Scanning Indicator */}
             {photoChecking && (
-              <div className="mt-2.5 p-3 bg-violet-50/90 border border-violet-200 rounded-2xl flex items-center justify-center gap-2.5 text-xs text-violet-800 font-bold animate-pulse">
-                <div className="w-3.5 h-3.5 border-2 border-violet-600 border-t-transparent rounded-full animate-spin"></div>
+              <div className="mt-2.5 p-3 bg-violet-50/90 dark:bg-violet-950/40 border border-violet-200 dark:border-violet-800/60 rounded-2xl flex items-center justify-center gap-2.5 text-xs text-violet-800 dark:text-violet-300 font-bold animate-pulse">
+                <div className="w-3.5 h-3.5 border-2 border-violet-600 dark:border-violet-400 border-t-transparent rounded-full animate-spin"></div>
                 <span>Gemini Vision AI is analyzing photo for "{formData.category || 'civic issue'}"...</span>
               </div>
             )}
 
             {/* AI Vision Approval Card */}
             {!photoChecking && photoVerificationResult && photoVerificationResult.verified === true && (
-              <div className="mt-2.5 p-3.5 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs space-y-1 shadow-xs">
-                <div className="flex items-center gap-1.5 font-bold text-emerald-900">
+              <div className="mt-2.5 p-3.5 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-2xl text-xs space-y-1 shadow-xs">
+                <div className="flex items-center gap-1.5 font-bold text-emerald-900 dark:text-emerald-200">
                   <span>✅</span>
                   <span>AI Vision Verified: Genuine Civic Evidence</span>
                 </div>
-                <p className="text-emerald-800 text-[11px] leading-relaxed">
+                <p className="text-emerald-800 dark:text-emerald-300 text-[11px] leading-relaxed">
                   <strong>Detected:</strong> {photoVerificationResult.detectedContent}. {photoVerificationResult.explanation}
                 </p>
               </div>
@@ -834,22 +834,22 @@ export default function ReportIssue() {
 
             {/* AI Vision Rejection Card (e.g. Game Cover, Meme, Selfie, Fake) */}
             {!photoChecking && photoVerificationResult && photoVerificationResult.verified === false && (
-              <div className="mt-2.5 p-4 bg-rose-50 border-2 border-rose-300 rounded-2xl text-xs space-y-2 shadow-sm text-left">
+              <div className="mt-2.5 p-4 bg-rose-50 dark:bg-rose-950/40 border-2 border-rose-300 dark:border-rose-800/60 rounded-2xl text-xs space-y-2 shadow-sm text-left">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1.5 font-extrabold text-rose-900">
+                  <div className="flex items-center gap-1.5 font-extrabold text-rose-900 dark:text-rose-200">
                     <span className="text-base">❌</span>
                     <span>AI Vision Rejected: Photo Mismatch</span>
                   </div>
                   <button
                     type="button"
                     onClick={handleRemovePhoto}
-                    className="px-2.5 py-1 bg-rose-200/70 hover:bg-rose-200 text-rose-900 rounded-lg text-[11px] font-bold transition"
+                    className="px-2.5 py-1 bg-rose-200/70 dark:bg-rose-900/60 hover:bg-rose-200 dark:hover:bg-rose-800 text-rose-900 dark:text-rose-200 rounded-lg text-[11px] font-bold transition"
                   >
                     Remove Photo
                   </button>
                 </div>
 
-                <div className="text-rose-800 text-[11px] leading-relaxed space-y-1">
+                <div className="text-rose-800 dark:text-rose-300 text-[11px] leading-relaxed space-y-1">
                   <p>
                     <strong>Observed Content:</strong> {photoVerificationResult.detectedContent}
                   </p>
@@ -859,7 +859,7 @@ export default function ReportIssue() {
                 </div>
 
                 {photoVerificationResult.suggestedCategory && (
-                  <div className="text-[11px] text-amber-900 font-semibold bg-amber-50 p-2 rounded-xl border border-amber-200 flex items-center justify-between">
+                  <div className="text-[11px] text-amber-900 dark:text-amber-200 font-semibold bg-amber-50 dark:bg-amber-950/50 p-2 rounded-xl border border-amber-200 dark:border-amber-800/60 flex items-center justify-between">
                     <span>💡 Suggested alternative category: <strong>{photoVerificationResult.suggestedCategory}</strong></span>
                     <button
                       type="button"
@@ -867,7 +867,7 @@ export default function ReportIssue() {
                         setFormData(prev => ({ ...prev, category: photoVerificationResult.suggestedCategory }));
                         verifyUploadedPhoto(formData.photoData, photoVerificationResult.suggestedCategory, formData.description);
                       }}
-                      className="px-2 py-0.5 bg-amber-200 text-amber-900 rounded text-[10px] font-bold"
+                      className="px-2 py-0.5 bg-amber-200 dark:bg-amber-900/80 text-amber-900 dark:text-amber-200 rounded text-[10px] font-bold"
                     >
                       Switch to {photoVerificationResult.suggestedCategory}
                     </button>
@@ -875,15 +875,15 @@ export default function ReportIssue() {
                 )}
 
                 {manualReviewRequested ? (
-                  <div className="pt-2 border-t border-amber-300/80 bg-amber-50/90 -mx-4 -mb-4 p-3 rounded-b-2xl">
-                    <div className="flex items-center gap-2 text-amber-900 font-bold text-[11px]">
+                  <div className="pt-2 border-t border-amber-300/80 dark:border-amber-800/60 bg-amber-50/90 dark:bg-amber-950/60 -mx-4 -mb-4 p-3 rounded-b-2xl">
+                    <div className="flex items-center gap-2 text-amber-900 dark:text-amber-200 font-bold text-[11px]">
                       <span>🛡️</span>
                       <span>Flagged for Zonal Officer On-Site Inspection</span>
                     </div>
-                    <p className="text-[10px] text-amber-800 mt-0.5">
+                    <p className="text-[10px] text-amber-800 dark:text-amber-300 mt-0.5">
                       Your photo will be physically audited by the municipal authority in the field. You can proceed to submit your grievance.
                     </p>
-                    <label className="flex items-center gap-2 mt-1.5 cursor-pointer text-[10px] text-amber-950 font-semibold">
+                    <label className="flex items-center gap-2 mt-1.5 cursor-pointer text-[10px] text-amber-950 dark:text-amber-200 font-semibold">
                       <input
                         type="checkbox"
                         checked={manualReviewRequested}
@@ -894,9 +894,9 @@ export default function ReportIssue() {
                     </label>
                   </div>
                 ) : (
-                  <div className="pt-2 border-t border-rose-200 text-[11px] space-y-2">
-                    <div className="p-2.5 bg-white/80 rounded-xl border border-rose-200">
-                      <label className="flex items-start gap-2 cursor-pointer text-gray-800">
+                  <div className="pt-2 border-t border-rose-200 dark:border-rose-800/60 text-[11px] space-y-2">
+                    <div className="p-2.5 bg-white/80 dark:bg-gray-800/80 rounded-xl border border-rose-200 dark:border-rose-800/60">
+                      <label className="flex items-start gap-2 cursor-pointer text-gray-800 dark:text-gray-200">
                         <input
                           type="checkbox"
                           checked={manualReviewRequested}
@@ -908,7 +908,7 @@ export default function ReportIssue() {
                         </span>
                       </label>
                     </div>
-                    <p className="text-[10px] text-rose-700 font-semibold">
+                    <p className="text-[10px] text-rose-700 dark:text-rose-400 font-semibold">
                       ⛔ If this image was uploaded by mistake, click "Remove Photo" above to submit without an image.
                     </p>
                   </div>

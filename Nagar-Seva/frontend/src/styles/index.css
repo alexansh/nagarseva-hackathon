@@ -12,11 +12,22 @@
 }
 
 /* Dark mode overrides for libraries */
-.dark .leaflet-layer,
+.dark .leaflet-tile-pane,
 .dark .leaflet-control-zoom-in,
 .dark .leaflet-control-zoom-out,
 .dark .leaflet-control-attribution {
   filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+}
+
+.dark .leaflet-popup-content-wrapper,
+.dark .leaflet-popup-tip {
+  background-color: #1f2937 !important;
+  color: #f3f4f6 !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5) !important;
+}
+
+.dark .leaflet-popup-content {
+  color: #f3f4f6 !important;
 }
 
 .dark .recharts-cartesian-grid-horizontal line,
@@ -73,4 +84,12 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #9ca3af;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #4b5563;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
 }

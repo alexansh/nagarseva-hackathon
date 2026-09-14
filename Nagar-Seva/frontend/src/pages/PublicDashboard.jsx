@@ -63,13 +63,13 @@ export default function PublicDashboard() {
   const getStatusBadge = (status) => {
     switch (status) {
       case 'OPEN':
-        return 'bg-amber-50 text-amber-800 border border-amber-200';
+        return 'bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60';
       case 'IN_PROGRESS':
-        return 'bg-blue-50 text-blue-800 border border-blue-200';
+        return 'bg-blue-50 dark:bg-blue-950/40 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-800/60';
       case 'RESOLVED':
-        return 'bg-emerald-50 text-emerald-800 border border-emerald-200';
+        return 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60';
       case 'ESCALATED':
-        return 'bg-rose-50 text-rose-800 border border-rose-200 font-bold';
+        return 'bg-rose-50 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-800/60 font-bold';
       default:
         return 'bg-gray-50 dark:bg-gray-900 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700';
     }
@@ -213,7 +213,7 @@ export default function PublicDashboard() {
             <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
               Total Inflow
             </span>
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-violet-50 text-violet-700">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-violet-50 dark:bg-violet-950/40 text-violet-700 dark:text-violet-300 border border-violet-100 dark:border-violet-800/50">
               Live
             </span>
           </div>
@@ -224,51 +224,51 @@ export default function PublicDashboard() {
         </div>
 
         {/* Resolved */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 sm:p-5 shadow-sm dark:shadow-none border border-emerald-100">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 sm:p-5 shadow-sm dark:shadow-none border border-emerald-100 dark:border-emerald-900/40">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-emerald-600 uppercase tracking-wider">
+            <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
               Resolved Issues
             </span>
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-800/50">
               +{overallResolutionRate}%
             </span>
           </div>
-          <div className="text-3xl font-black text-emerald-600 mt-1 tracking-tight">
+          <div className="text-3xl font-black text-emerald-600 dark:text-emerald-400 mt-1 tracking-tight">
             {resolvedCount}
           </div>
-          <p className="text-xs text-emerald-700/70 mt-0.5">Repairs verified & closed</p>
+          <p className="text-xs text-emerald-700/70 dark:text-emerald-400/70 mt-0.5">Repairs verified & closed</p>
         </div>
 
         {/* Active In Progress */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 sm:p-5 shadow-sm dark:shadow-none border border-amber-100">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 sm:p-5 shadow-sm dark:shadow-none border border-amber-100 dark:border-amber-900/40">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-amber-600 uppercase tracking-wider">
+            <span className="text-[11px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
               Active Pending
             </span>
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-100 dark:border-amber-800/50">
               In Field
             </span>
           </div>
-          <div className="text-3xl font-black text-amber-600 mt-1 tracking-tight">
+          <div className="text-3xl font-black text-amber-600 dark:text-amber-400 mt-1 tracking-tight">
             {pendingCount}
           </div>
-          <p className="text-xs text-amber-700/70 mt-0.5">Assigned to field staff</p>
+          <p className="text-xs text-amber-700/70 dark:text-amber-400/70 mt-0.5">Assigned to field staff</p>
         </div>
 
         {/* Escalated Alerts */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 sm:p-5 shadow-sm dark:shadow-none border border-rose-100">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 sm:p-5 shadow-sm dark:shadow-none border border-rose-100 dark:border-rose-900/40">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-rose-600 uppercase tracking-wider">
+            <span className="text-[11px] font-bold text-rose-600 dark:text-rose-400 uppercase tracking-wider">
               Escalated Alerts
             </span>
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-100 dark:border-rose-800/50">
               High Priority
             </span>
           </div>
-          <div className="text-3xl font-black text-rose-600 mt-1 tracking-tight">
+          <div className="text-3xl font-black text-rose-600 dark:text-rose-400 mt-1 tracking-tight">
             {escalatedCount}
           </div>
-          <p className="text-xs text-rose-700/70 mt-0.5">Exceeded SLA response</p>
+          <p className="text-xs text-rose-700/70 dark:text-rose-400/70 mt-0.5">Exceeded SLA response</p>
         </div>
       </div>
 
@@ -372,7 +372,7 @@ export default function PublicDashboard() {
             <h2 className="text-base font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">
               Resolution Efficiency
             </h2>
-            <span className="text-xs font-bold text-[#7c5cff] bg-violet-50 px-2.5 py-0.5 rounded-full border border-violet-100">
+            <span className="text-xs font-bold text-[#7c5cff] dark:text-violet-300 bg-violet-50 dark:bg-violet-950/40 px-2.5 py-0.5 rounded-full border border-violet-100 dark:border-violet-800/60">
               City SLA
             </span>
           </div>
@@ -439,23 +439,23 @@ export default function PublicDashboard() {
                   <th className="pb-3 text-right pr-2">Avg SLA</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50 text-xs font-medium">
+              <tbody className="divide-y divide-gray-50 dark:divide-gray-700/60 text-xs font-medium">
                 {wardRanking.map((item, idx) => (
-                  <tr key={item.ward} className="hover:bg-gray-50 dark:bg-gray-900/80 transition">
+                  <tr key={item.ward} className="hover:bg-gray-50 dark:hover:bg-gray-900/80 transition">
                     <td className="py-3.5 pl-2 font-bold text-gray-900 dark:text-gray-100">
                       <span className={`w-6 h-6 rounded-full inline-flex items-center justify-center text-[11px] ${
-                        idx === 0 ? 'bg-amber-100 text-amber-800 font-bold' :
-                        idx === 1 ? 'bg-slate-100 text-slate-800' : 'text-gray-500 dark:text-gray-400'
+                        idx === 0 ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 font-bold' :
+                        idx === 1 ? 'bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-200' : 'text-gray-500 dark:text-gray-400'
                       }`}>
                         #{idx + 1}
                       </span>
                     </td>
                     <td className="py-3.5 font-bold text-gray-900 dark:text-gray-100">{item.ward}</td>
                     <td className="py-3.5 text-center text-gray-600 dark:text-gray-400 font-semibold">{item.total}</td>
-                    <td className="py-3.5 text-center text-emerald-600 font-semibold">{item.resolved}</td>
+                    <td className="py-3.5 text-center text-emerald-600 dark:text-emerald-400 font-semibold">{item.resolved}</td>
                     <td className="py-3.5">
                       <div className="flex items-center gap-2">
-                        <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="flex-1 h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
                           <div
                             className="h-full bg-[#7c5cff] rounded-full transition-all duration-500"
                             style={{ width: `${Math.min(100, Math.max(5, item.resolutionRate))}%` }}
@@ -501,7 +501,7 @@ export default function PublicDashboard() {
                 className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
                   filterStatus === st
                     ? 'bg-[#7c5cff] text-white shadow-xs'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:text-gray-100 hover:bg-gray-100'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800'
                 }`}
               >
                 {st === 'ALL' ? 'All Status' : st.replace('_', ' ')}
@@ -520,7 +520,7 @@ export default function PublicDashboard() {
             {filteredComplaints.map((c) => (
               <div
                 key={c.id}
-                className="p-4 rounded-xl bg-gray-50 dark:bg-gray-900 hover:bg-gray-100/80 transition flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                className="p-4 rounded-xl bg-gray-50 dark:bg-gray-900 hover:bg-gray-100/80 dark:hover:bg-gray-800/80 transition flex flex-col sm:flex-row sm:items-center justify-between gap-4"
               >
                 <div className="flex items-start gap-3 min-w-0">
                   <div className="w-10 h-10 rounded-xl bg-white dark:bg-gray-800 shadow-xs border border-gray-100 dark:border-gray-700 flex items-center justify-center text-lg shrink-0 mt-0.5">
@@ -535,12 +535,12 @@ export default function PublicDashboard() {
                         #{c.id} • {c.ward || 'Ward 1'} • {c.location || 'Central'}
                       </span>
                       {c.imageVerified === true && (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-800/60">
                           ✓ AI Verified
                         </span>
                       )}
                       {c.escalated && (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800/60">
                           ⚠️ Escalated
                         </span>
                       )}

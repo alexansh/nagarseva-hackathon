@@ -834,7 +834,7 @@ export default function MunicipalOfficerDashboard() {
       <div className="bg-gradient-to-r from-gray-900 to-gray-800 text-white rounded-3xl p-6 sm:p-7 shadow-lg">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-white dark:bg-gray-800/10 rounded-full text-xs font-bold mb-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 rounded-full text-xs font-bold mb-2">
               <span>🚨</span>
               <span>Direct Municipal Operational Dispatch</span>
             </div>
@@ -851,7 +851,7 @@ export default function MunicipalOfficerDashboard() {
               <button
                 key={action.id}
                 onClick={() => handleTriggerQuickAction(action)}
-                className="px-4 py-2.5 bg-white dark:bg-gray-800/10 hover:bg-white dark:bg-gray-800 text-white hover:text-gray-900 dark:text-gray-100 text-xs font-bold rounded-2xl transition border border-white/20 shadow-xs inline-flex items-center gap-2 cursor-pointer"
+                className="px-4 py-2.5 bg-white/10 hover:bg-white text-white hover:text-gray-900 text-xs font-bold rounded-2xl transition border border-white/20 shadow-xs inline-flex items-center gap-2 cursor-pointer"
               >
                 <span>{action.icon}</span>
                 <span>{action.label}</span>
@@ -868,11 +868,11 @@ export default function MunicipalOfficerDashboard() {
               {actionHistory.map((item) => (
                 <span
                   key={item.id}
-                  className="text-[11px] bg-white dark:bg-gray-800/5 border border-white/10 px-3 py-1 rounded-full text-gray-300 font-medium inline-flex items-center gap-1.5"
+                  className="text-[11px] bg-white/5 border border-white/10 px-3 py-1 rounded-full text-gray-300 font-medium inline-flex items-center gap-1.5"
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
                   <span>{item.title}</span>
-                  <span className="text-gray-500 dark:text-gray-400">({item.time})</span>
+                  <span className="text-gray-400">({item.time})</span>
                 </span>
               ))}
             </div>

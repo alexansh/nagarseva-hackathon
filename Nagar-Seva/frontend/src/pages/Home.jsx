@@ -46,11 +46,11 @@ export default function Home() {
             </p>
           </div>
           <div className="grid grid-cols-2 gap-2 pt-2 border-t border-accent-subtle/50 text-left">
-            <div className="bg-white dark:bg-gray-800/80 p-2.5 rounded-xl">
+            <div className="bg-white/80 dark:bg-gray-800/80 p-2.5 rounded-xl">
               <span className="text-[10px] font-bold text-gray-400 uppercase">AI Vision</span>
               <p className="text-xs font-bold text-gray-900 dark:text-gray-100 mt-0.5">Auto-Verified</p>
             </div>
-            <div className="bg-white dark:bg-gray-800/80 p-2.5 rounded-xl">
+            <div className="bg-white/80 dark:bg-gray-800/80 p-2.5 rounded-xl">
               <span className="text-[10px] font-bold text-gray-400 uppercase">SLA Window</span>
               <p className="text-xs font-bold text-accent mt-0.5">5m Escalation</p>
             </div>
