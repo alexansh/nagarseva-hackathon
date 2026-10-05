@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NagarSeva - Team Presentation Script (4 Speakers)</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --s1-color: #2563eb;
+      --s1-bg: #eff6ff;
+      --s2-color: #059669;
+      --s2-bg: #ecfdf5;
+      --s3-color: #7c3aed;
+      --s3-bg: #f5f3ff;
+      --s4-color: #d97706;
+      --s4-bg: #fffbeb;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      line-height: 1.6;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 24px;
+    }
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--border);
+    }
+    header {
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 20px;
+      margin-bottom: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    h1 {
+      font-size: 26px;
+      margin: 0 0 6px 0;
+      color: #0f172a;
+    }
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin: 0;
+    }
+    .print-btn {
+      background: #0f172a;
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s;
+    }
+    .print-btn:hover {
+      background: #334155;
+    }
+    .role-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+    .role-pill {
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      font-size: 13px;
+    }
+    .role-pill strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 14px;
+    }
+    .pill-s1 { background: var(--s1-bg); border-color: #bfdbfe; color: #1e40af; }
+    .pill-s2 { background: var(--s2-bg); border-color: #a7f3d0; color: #065f46; }
+    .pill-s3 { background: var(--s3-bg); border-color: #ddd6fe; color: #5b21b6; }
+    .pill-s4 { background: var(--s4-bg); border-color: #fde68a; color: #92400e; }
+    .speaker-card {
+      margin-bottom: 32px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      background: white;
+    }
+    .card-header {
+      padding: 14px 20px;
+      font-weight: bold;
+      font-size: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .header-s1 { background: var(--s1-bg); color: var(--s1-color); border-bottom: 1px solid #bfdbfe; }
+    .header-s2 { background: var(--s2-bg); color: var(--s2-color); border-bottom: 1px solid #a7f3d0; }
+    .header-s3 { background: var(--s3-bg); color: var(--s3-color); border-bottom: 1px solid #ddd6fe; }
+    .header-s4 { background: var(--s4-bg); color: var(--s4-color); border-bottom: 1px solid #fde68a; }
+    .card-body {
+      padding: 24px;
+      font-size: 15px;
+      line-height: 1.7;
+      color: #1e293b;
+    }
+    .speech-quote {
+      font-style: italic;
+      color: #334155;
+      background: #f8fafc;
+      padding: 18px 20px;
+      border-left: 4px solid #94a3b8;
+      border-radius: 0 10px 10px 0;
+      margin: 12px 0 0 0;
+    }
+    .speech-quote strong {
+      font-style: normal;
+      color: #0f172a;
+    }
+    .stage-direction {
+      color: #64748b;
+      font-size: 13px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+    .checklist {
+      background: #f1f5f9;
+      border-radius: 14px;
+      padding: 20px;
+      margin-top: 30px;
+    }
+    .checklist h3 {
+      margin-top: 0;
+      font-size: 16px;
+    }
+    .checklist ul {
+      margin: 0;
+      padding-left: 20px;
+      font-size: 14px;
+    }
+    .checklist li {
+      margin-bottom: 6px;
+    }
+    @media print {
+      body { padding: 0; background: white; }
+      .container { box-shadow: none; border: none; padding: 0; }
+      .print-btn { display: none; }
+      .speaker-card { page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>🏛️ NagarSeva: Team Presentation Script</h1>
+        <p class="subtitle">Estimated Duration: 6–8 minutes (4 Team Members &bull; ~1.5–2 mins each)</p>
+      </div>
+      <button class="print-btn" onclick="window.print()">🖨️ Print or Save as PDF</button>
+    </header>
+
+    <div class="role-grid">
+      <div class="role-pill pill-s1">
+        <strong>Speaker 1</strong>
+        Problem, Citizen Portal & Leaflet Map
+      </div>
+      <div class="role-pill pill-s2">
+        <strong>Speaker 2</strong>
+        Custom ML Model (MobileNetV2 & Data)
+      </div>
+      <div class="role-pill pill-s3">
+        <strong>Speaker 3</strong>
+        Gemini Vision & Fraud-Proof Audit
+      </div>
+      <div class="role-pill pill-s4">
+        <strong>Speaker 4</strong>
+        Backend, Dashboards & Architecture
+      </div>
+    </div>
+
+    <!-- SPEAKER 1 -->
+    <div class="speaker-card">
+      <div class="card-header header-s1">
+        <span>Speaker 1: The Problem & Citizen Portal</span>
+        <span style="font-size:12px;font-weight:normal;">~1.5 - 2 mins</span>
+      </div>
+      <div class="card-body">
+        <div class="stage-direction">[Speaker 1 steps forward, smiles, looks at supervisor]</div>
+        <div class="speech-quote">
+          "Good morning, respected supervisor and evaluators. Today, our team is excited to present <strong>NagarSeva</strong>, an intelligent, end-to-end municipal grievance redressal platform.<br><br>
+          In almost every Indian city, citizens struggle with common civic issues: broken roads, waterlogged streets, dark streetlights, and overflowing garbage. But traditional municipal complaint portals face two massive problems:<br>
+          <strong>1. Citizen friction:</strong> Citizens don’t know which department handles which problem or which ward they belong to.<br>
+          <strong>2. Spam & fake reports:</strong> People upload random photos—selfies, indoor rooms, or internet memes—flooding municipal offices with fake complaints.<br><br>
+          To solve this, we built NagarSeva around a <strong>Two-Tier AI Architecture</strong>.<br><br>
+          Let’s look at the citizen's journey:<br>
+          &bull; A citizen opens our platform on their phone. Right away, they can chat with our <strong>Civic AI Assistant</strong> to ask questions in plain English or Hindi.<br>
+          &bull; When reporting an issue, they drop a pin on our <strong>Interactive Leaflet Map</strong>, and the system automatically determines their ward.<br>
+          &bull; If they write a messy description, they click <strong>'Refine with AI'</strong>, and our model polishes it into a clean, professional municipal ticket.<br><br>
+          But the most critical step is <strong>photo verification</strong>. How do we know the uploaded photo is a real civic defect and not spam?<br><br>
+          For that, I’ll hand over to <strong>[Speaker 2]</strong>, who will explain our custom Machine Learning model."
+        </div>
+      </div>
+    </div>
+
+    <!-- SPEAKER 2 -->
+    <div class="speaker-card">
+      <div class="card-header header-s2">
+        <span>Speaker 2: Custom Machine Learning (Tier-1 Edge Model)</span>
+        <span style="font-size:12px;font-weight:normal;">~1.5 - 2 mins</span>
+      </div>
+      <div class="card-body">
+        <div class="stage-direction">[Speaker 2 steps forward]</div>
+        <div class="speech-quote">
+          "Thank you, <strong>[Speaker 1]</strong>.<br><br>
+          One of our core engineering decisions was: <strong>we did not want to rely solely on cloud AI APIs for every single image.</strong> Sending thousands of photos to a cloud API is slow, expensive, and wastes server resources on spam.<br><br>
+          So, we built our own <strong>Tier-1 Edge Computer Vision Model</strong> using <strong>Transfer Learning on MobileNetV2</strong>:<br>
+          &bull; <strong>Why MobileNetV2?</strong> It is extremely compact—only <strong>3.4 million parameters</strong> and a <strong>9.1 megabyte</strong> model file. It processes an image in under <strong>18 milliseconds on a standard CPU</strong>, meaning municipal offices don't need expensive supercomputers to run it.<br><br>
+          When a photo is uploaded, our model does two things instantly:<br>
+          <strong>1. Spam Rejection:</strong> It acts as an automatic gatekeeper. If someone uploads a selfie, a meme, or a pet, it detects the negative control pattern and immediately rejects it with status <code>REJECTED_NON_CIVIC</code>.<br>
+          <strong>2. Defect Classification:</strong> If it is a real issue, it classifies the defect across our 6 municipal categories with a confidence score.<br><br>
+          Now, where did our training data come from? We grounded our training in <strong>three authoritative open-source research datasets from GitHub</strong>:<br>
+          &bull; For road defects and potholes, we used the <strong>University of Tokyo's RDD2022 dataset</strong> (<code>sekilab/RoadDamageDetector</code>), which contains 47,000 annotated road images from India and Japan.<br>
+          &bull; For garbage and waste dumping, we integrated <strong>Imperial College London’s TACO dataset</strong> (<code>pedropro/TACO</code>) and <strong>Stanford University’s TrashNet</strong> (<code>garythung/trashnet</code>).<br>
+          &bull; For spam filtering, we trained on negative control slices from <strong>ImageNet-1K</strong>.<br><br>
+          Our model achieved a <strong>1.00 Macro F1-score</strong> on our held-out test data with zero false positives on spam.<br><br>
+          Now, what happens after our ML model verifies the photo? <strong>[Speaker 3]</strong> will explain how our Tier-2 Cognitive AI takes over."
+        </div>
+      </div>
+    </div>
+
+    <!-- SPEAKER 3 -->
+    <div class="speaker-card">
+      <div class="card-header header-s3">
+        <span>Speaker 3: Cognitive AI & Tamper-Proof Audit (Tier-2)</span>
+        <span style="font-size:12px;font-weight:normal;">~1.5 - 2 mins</span>
+      </div>
+      <div class="card-body">
+        <div class="stage-direction">[Speaker 3 steps forward]</div>
+        <div class="speech-quote">
+          "Thanks, <strong>[Speaker 2]</strong>.<br><br>
+          Once our custom ML model confirms: <em>'Yes, this is genuine road damage with 99% confidence'</em>, the ticket moves to <strong>Tier-2: Cognitive AI powered by Google Gemini Vision</strong>.<br><br>
+          While our custom ML model is fast at classification, Gemini handles the <strong>deep reasoning</strong>:<br>
+          &bull; It analyzes the severity: is this a minor crack or a dangerous deep pothole?<br>
+          &bull; It performs <strong>Visual OCR</strong> to read street signs or printed lamppost ID numbers.<br>
+          &bull; And it automatically routes the ticket to the exact municipal division.<br><br>
+          But we didn't stop at reporting. We also solved the biggest issue in municipal governance: <strong>fake ticket closures.</strong><br><br>
+          In many cities, contractors mark tickets as 'Resolved' without actually fixing anything. In NagarSeva:<br>
+          &bull; A municipal officer <strong>cannot</strong> close a ticket with just a checkbox.<br>
+          &bull; The officer must upload a <strong>Resolution Photo</strong> of the completed work.<br>
+          &bull; Our system runs <strong>Photo Forensics</strong> to check camera EXIF timestamps and verify GPS coordinates.<br>
+          &bull; Then, our AI auditor compares the <strong>original citizen photo</strong> side-by-side with the <strong>officer's resolution photo</strong>. It checks if the pothole is genuinely filled with fresh asphalt and confirms background landmarks match.<br><br>
+          If the work isn't done, the ticket stays open. This makes NagarSeva completely transparent and fraud-proof.<br><br>
+          Now, <strong>[Speaker 4]</strong> will explain the backend engine and show how all of this connects."
+        </div>
+      </div>
+    </div>
+
+    <!-- SPEAKER 4 -->
+    <div class="speaker-card">
+      <div class="card-header header-s4">
+        <span>Speaker 4: Backend Engineering, Live Dashboards & Impact</span>
+        <span style="font-size:12px;font-weight:normal;">~1.5 - 2 mins</span>
+      </div>
+      <div class="card-body">
+        <div class="stage-direction">[Speaker 4 steps forward]</div>
+        <div class="speech-quote">
+          "Thank you, <strong>[Speaker 3]</strong>.<br><br>
+          Powering this entire ecosystem is our backend built on <strong>Java 17 and Spring Boot 3</strong>:<br>
+          &bull; <strong>Robust REST API:</strong> Handles user authentication, complaint submission, role-based access control (Citizen, Officer, Admin), and database transactions.<br>
+          &bull; <strong>Database Layer:</strong> Uses <strong>PostgreSQL</strong> in production on the cloud, with an automated <strong>H2 in-memory fallback</strong> for offline development.<br>
+          &bull; <strong>Real-Time WebSockets:</strong> When a citizen submits a report, the complaint instantly pops up on the <strong>Municipal Officer Dashboard</strong> without requiring a page refresh.<br><br>
+          We also built dedicated portals for every stakeholder:<br>
+          <strong>1. Municipal Officer Dashboard:</strong> Where field teams track tickets, navigate to defect coordinates, and submit resolution proofs.<br>
+          <strong>2. Public Transparency Portal:</strong> Any citizen can enter a ticket ID to see real-time progress and view the before-and-after photo evidence.<br>
+          <strong>3. Safety Heatmap:</strong> Visualizes city-wide safety data, showing ward-level defect clusters to help city planners prioritize long-term infrastructure budgets.<br><br>
+          In summary, NagarSeva is not just a form and not just an API wrapper:<br>
+          &bull; It combines <strong>edge computer vision (MobileNetV2)</strong> for fast, free local screening...<br>
+          &bull; <strong>Multimodal generative AI (Gemini)</strong> for reasoning and fraud prevention...<br>
+          &bull; And an <strong>enterprise-grade Spring Boot architecture</strong> for municipal scalability.<br><br>
+          All of our code, trained model weights, evaluation plots, and documentation are committed and live on our GitHub repository.<br><br>
+          Thank you, and we are now ready for your questions!"
+        </div>
+      </div>
+    </div>
+
+    <div class="checklist">
+      <h3>🎯 Quick Delivery Checklist for the Team</h3>
+      <ul>
+        <li><strong>Practice Hand-offs:</strong> Always verbally introduce the next teammate: <em>"Now I'll hand over to [Name]..."</em></li>
+        <li><strong>Terminal Demo Command:</strong> <code>python infer.py dataset/test/Road_Damage/road_damage_test_001.jpg</code></li>
+        <li><strong>Spam Rejection Command:</strong> <code>python infer.py dataset/test/Non_Civic_Spam/non_civic_spam_test_001.jpg</code></li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html>
