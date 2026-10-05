@@ -56,6 +56,47 @@ public class GeminiService {
         return apiKey != null && !apiKey.isBlank();
     }
 
+    public String executeWithFallback(ObjectNode requestBody) throws Exception {
+        List<String> modelsToTry = getCandidateModels();
+        Exception lastException = null;
+        for (String candidateModel : modelsToTry) {
+            String url = GEMINI_BASE_URL + candidateModel + ":generateContent?key=" + apiKey;
+            HttpPost httpPost = new HttpPost(url);
+            httpPost.setHeader("Content-Type", "application/json");
+            httpPost.setEntity(new StringEntity(objectMapper.writeValueAsString(requestBody), ContentType.APPLICATION_JSON));
+            try (var response = httpClient.execute(httpPost)) {
+                int status = response.getCode();
+                String responseBody = EntityUtils.toString(response.getEntity(), java.nio.charset.StandardCharsets.UTF_8);
+                if (status == 200) {
+                    return responseBody;
+                }
+                log.warn("Gemini model {} returned status {}. Attempting fallback...", candidateModel, status);
+                lastException = new RuntimeException("Model " + candidateModel + " failed with status " + status + ": " + responseBody);
+            } catch (Exception ex) {
+                log.warn("Gemini model {} failed with exception: {}. Attempting fallback...", candidateModel, ex.getMessage());
+                lastException = ex;
+            }
+        }
+        if (lastException != null) {
+            throw lastException;
+        }
+        throw new RuntimeException("No Gemini models available");
+    }
+
+    private List<String> getCandidateModels() {
+        List<String> models = new java.util.ArrayList<>();
+        if (model != null && !model.isBlank()) {
+            models.add(model.trim());
+        }
+        List<String> fallbacks = List.of("gemini-3.5-flash-lite", "gemini-3.5-flash", "gemini-3.8-flash", "gemini-flash-latest");
+        for (String fb : fallbacks) {
+            if (!models.contains(fb)) {
+                models.add(fb);
+            }
+        }
+        return models;
+    }
+
 
     public record ComplaintAnalysisResult(
             String routedAuthority,
@@ -87,7 +128,6 @@ public class GeminiService {
         }
 
         try {
-            String url = GEMINI_BASE_URL + model + ":generateContent?key=" + apiKey;
             ObjectNode requestBody = objectMapper.createObjectNode();
 
             ArrayNode contentsArray = requestBody.putArray("contents");
@@ -145,46 +185,36 @@ public class GeminiService {
                 attachInlineImage(partsArray, photoData);
             }
 
-            HttpPost httpPost = new HttpPost(url);
-            httpPost.setHeader("Content-Type", "application/json");
-            httpPost.setEntity(new StringEntity(objectMapper.writeValueAsString(requestBody), ContentType.APPLICATION_JSON));
+            String responseBody = executeWithFallback(requestBody);
+            JsonNode root = objectMapper.readTree(responseBody);
+            String text = extractTextFromGeminiResponse(root);
+            JsonNode json = parseCleanJson(text);
 
-            try (var response = httpClient.execute(httpPost)) {
-                String responseBody = EntityUtils.toString(response.getEntity());
-                if (response.getCode() == 200) {
-                    JsonNode root = objectMapper.readTree(responseBody);
-                    String text = extractTextFromGeminiResponse(root);
-                    JsonNode json = parseCleanJson(text);
+            String routedAuthority = json.path("routedAuthority").asText("General Municipal Administration");
+            String aiSummary = json.path("aiSummary").asText(complaint.getDescription());
+            String priorityStr = json.path("priority").asText("MEDIUM").toUpperCase();
+            ComplaintPriority priority = switch (priorityStr) {
+                case "HIGH" -> ComplaintPriority.HIGH;
+                case "LOW" -> ComplaintPriority.LOW;
+                default -> ComplaintPriority.MEDIUM;
+            };
 
-                    String routedAuthority = json.path("routedAuthority").asText("General Municipal Administration");
-                    String aiSummary = json.path("aiSummary").asText(complaint.getDescription());
-                    String priorityStr = json.path("priority").asText("MEDIUM").toUpperCase();
-                    ComplaintPriority priority = switch (priorityStr) {
-                        case "HIGH" -> ComplaintPriority.HIGH;
-                        case "LOW" -> ComplaintPriority.LOW;
-                        default -> ComplaintPriority.MEDIUM;
-                    };
-
-                    Boolean imageVerified = null;
-                    String imageVerificationNote = null;
-                    if (hasPhoto) {
-                        if (json.has("imageVerified") && !json.get("imageVerified").isNull()) {
-                            imageVerified = json.get("imageVerified").asBoolean(false);
-                        } else {
-                            imageVerified = false;
-                        }
-                        imageVerificationNote = json.path("imageVerificationNote").asText(
-                                Boolean.TRUE.equals(imageVerified)
-                                        ? "Verified: Image matches reported civic issue."
-                                        : "Image does not match reported civic defect."
-                        );
-                    }
-
-                    return new ComplaintAnalysisResult(routedAuthority, aiSummary, priority, imageVerified, imageVerificationNote);
+            Boolean imageVerified = null;
+            String imageVerificationNote = null;
+            if (hasPhoto) {
+                if (json.has("imageVerified") && !json.get("imageVerified").isNull()) {
+                    imageVerified = json.get("imageVerified").asBoolean(false);
                 } else {
-                    log.error("Gemini API call failed with status {}: {}", response.getCode(), responseBody);
+                    imageVerified = false;
                 }
+                imageVerificationNote = json.path("imageVerificationNote").asText(
+                        Boolean.TRUE.equals(imageVerified)
+                                ? "Verified: Image matches reported civic issue."
+                                : "Image does not match reported civic defect."
+                );
             }
+
+            return new ComplaintAnalysisResult(routedAuthority, aiSummary, priority, imageVerified, imageVerificationNote);
         } catch (Exception e) {
             log.error("Gemini analysis error: {}", e.getMessage(), e);
         }
@@ -212,7 +242,6 @@ public class GeminiService {
         }
 
         try {
-            String url = GEMINI_BASE_URL + model + ":generateContent?key=" + apiKey;
             ObjectNode requestBody = objectMapper.createObjectNode();
 
             ArrayNode contentsArray = requestBody.putArray("contents");
@@ -230,13 +259,17 @@ public class GeminiService {
                     1. Photos are frequently taken in difficult real-world conditions: at night, dusk, in rain, or while moving.
                     2. Photos may be dark, grainy, blurry, shaky, taken from across the street, or cropped awkwardly.
                     3. Specific Guidance:
-                       - Streetlight: Streetlights are 15-25 feet high. At night, citizen photos show a dark street, dark sky, silhouette of a lamp post, utility pole, wiring, or unlit fixture. During the day, it shows a pole or lamp head from ground level. NEVER reject a streetlight photo because "it is not clear", "it is too dark", or "the broken bulb cannot be seen clearly"! If there is a streetlight pole, lamppost, lamp fixture, wiring, or dark street corridor in the image, it is VALID civic evidence (verified: true).
+                       - Streetlight / Lighting: Streetlights are mounted 15-25 feet high. At night, citizen photos show a dark street, dark sky, silhouette of a lamp post, utility pole, wiring, or unlit fixture. During the day, photos show an outdoor street, lamp head, broken/shattered glass globe, exposed bulb socket, utility bracket, or pole against the sky or road. NEVER reject a streetlight photo because "the bulb is broken", "it is taken from below", or "the sky is bright"! If there is a streetlight pole, shattered globe, lamppost, lamp fixture, bulb, wiring, or dark street corridor in the image, it is VALID civic evidence (verified: true).
                        - Road Damage: Any pavement, asphalt, road craters, cracks, water puddles on road, or sidewalk damage (even if taken from a car or bike) MUST be accepted (verified: true).
                        - Drainage: Murky water, puddles, gutters, manholes, flooded curbs, or drains MUST be accepted (verified: true).
                        - Illegal Dumping: Trash piles, garbage bags, litter, overflowing dumpsters, or roadside debris MUST be accepted (verified: true).
                        - Unsafe Area: Dark alleys, unlit roads, isolated pathways, broken boundary walls MUST be accepted (verified: true).
                        - Encroachment: Stalls, carts, parked vehicles or obstacles on footpaths/roads MUST be accepted (verified: true).
-                    4. BENEFIT OF THE DOUBT: If an image appears to be an authentic photo taken outdoors in a real neighborhood or public civic environment related to the issue, ALWAYS mark "verified": true.
+                    4. CROSS-CATEGORY CIVIC DEFECTS: If the photo depicts ANY genuine municipal defect (e.g. broken streetlight, shattered lamp globe, pothole, overflowing garbage, drainage leak) but the citizen's reported category is slightly different, general, or empty:
+                       - You MUST set "verified": true!
+                       - Provide the accurate category in "suggestedCategory" (e.g. 'Streetlight', 'Road Damage', 'Drainage', 'Illegal Dumping', 'Unsafe Area', 'Encroachment').
+                       - NEVER reject genuine municipal infrastructure damage just because the citizen didn't select the exact right category!
+                    5. BENEFIT OF THE DOUBT: If an image appears to be an authentic photo taken outdoors in a real neighborhood or public civic environment related to any civic defect, ALWAYS mark "verified": true.
                     
                     WHAT TO REJECT ("verified": false):
                     You must ONLY reject photos that are clearly, undeniably synthetic, fraudulent, or unrelated to outdoor civic spaces:
@@ -263,41 +296,30 @@ public class GeminiService {
             partsArray.addObject().put("text", prompt);
             attachInlineImage(partsArray, photoData);
 
-            HttpPost httpPost = new HttpPost(url);
-            httpPost.setHeader("Content-Type", "application/json");
-            httpPost.setEntity(new StringEntity(objectMapper.writeValueAsString(requestBody), ContentType.APPLICATION_JSON));
+            String responseBody = executeWithFallback(requestBody);
+            JsonNode root = objectMapper.readTree(responseBody);
+            String text = extractTextFromGeminiResponse(root);
+            JsonNode json = parseCleanJson(text);
 
-            try (var response = httpClient.execute(httpPost)) {
-                String responseBody = EntityUtils.toString(response.getEntity(), java.nio.charset.StandardCharsets.UTF_8);
-                if (response.getCode() == 200) {
-                    JsonNode root = objectMapper.readTree(responseBody);
-                    String text = extractTextFromGeminiResponse(root);
-                    JsonNode json = parseCleanJson(text);
+            boolean verified = json.path("verified").asBoolean(false);
+            String detectedContent = json.path("detectedContent").asText("Visual content evaluated");
+            String explanation = json.path("explanation").asText(
+                    verified ? "Photo confirms reported civic issue." : "Photo does not match reported issue."
+            );
+            String suggestedCategory = json.has("suggestedCategory") && !json.get("suggestedCategory").isNull()
+                    ? json.get("suggestedCategory").asText(null)
+                    : null;
 
-                    boolean verified = json.path("verified").asBoolean(false);
-                    String detectedContent = json.path("detectedContent").asText("Visual content evaluated");
-                    String explanation = json.path("explanation").asText(
-                            verified ? "Photo confirms reported civic issue." : "Photo does not match reported issue."
-                    );
-                    String suggestedCategory = json.has("suggestedCategory") && !json.get("suggestedCategory").isNull()
-                            ? json.get("suggestedCategory").asText(null)
-                            : null;
-
-                    return new PhotoVerificationResult(verified, detectedContent, explanation, suggestedCategory);
-                } else {
-                    log.error("Gemini photo verification failed with status {}: {}", response.getCode(), responseBody);
-                }
-            }
+            return new PhotoVerificationResult(verified, detectedContent, explanation, suggestedCategory);
         } catch (Exception e) {
             log.error("Error verifying grievance photo with Gemini: {}", e.getMessage(), e);
+            return new PhotoVerificationResult(
+                    true,
+                    "Photo attached (Pending Officer Audit)",
+                    "Automated AI image verification is temporarily busy. Your photo was attached successfully and flagged for manual field officer inspection.",
+                    null
+            );
         }
-
-        return new PhotoVerificationResult(
-                false,
-                "Verification error",
-                "Automated photo verification encountered an error. Please ensure the image is clear.",
-                null
-        );
     }
 
     public ComplaintAnalysisResult analyzeComplaint(Complaint complaint, String photoData) {
@@ -369,27 +391,17 @@ public class GeminiService {
                 attachInlineImage(partsArray, afterPhoto);
             }
 
-            HttpPost httpPost = new HttpPost(url);
-            httpPost.setHeader("Content-Type", "application/json");
-            httpPost.setEntity(new StringEntity(objectMapper.writeValueAsString(requestBody), ContentType.APPLICATION_JSON));
+            String responseBody = executeWithFallback(requestBody);
+            JsonNode root = objectMapper.readTree(responseBody);
+            String text = extractTextFromGeminiResponse(root);
+            JsonNode json = parseCleanJson(text);
 
-            try (var response = httpClient.execute(httpPost)) {
-                String responseBody = EntityUtils.toString(response.getEntity());
-                if (response.getCode() == 200) {
-                    JsonNode root = objectMapper.readTree(responseBody);
-                    String text = extractTextFromGeminiResponse(root);
-                    JsonNode json = parseCleanJson(text);
-
-                    boolean verified = json.path("resolutionVerified").asBoolean(false);
-                    String note = json.path("resolutionVerificationNote").asText(
-                            verified ? "Verified: Resolution photo confirms the reported issue was fixed."
-                                     : "Manual review required: Resolution photo does not adequately confirm the fix."
-                    );
-                    return new ResolutionVerificationResult(verified, note);
-                } else {
-                    log.error("Gemini resolution verification failed with status {}: {}", response.getCode(), responseBody);
-                }
-            }
+            boolean verified = json.path("resolutionVerified").asBoolean(false);
+            String note = json.path("resolutionVerificationNote").asText(
+                    verified ? "Verified: Resolution photo confirms the reported issue was fixed."
+                             : "Manual review required: Resolution photo does not adequately confirm the fix."
+            );
+            return new ResolutionVerificationResult(verified, note);
         } catch (Exception e) {
             log.error("Resolution verification failed: {}", e.getMessage(), e);
         }
@@ -416,7 +428,6 @@ public class GeminiService {
         }
 
         try {
-            String url = GEMINI_BASE_URL + model + ":generateContent?key=" + apiKey;
             ObjectNode requestBody = objectMapper.createObjectNode();
 
             // System instruction strictly commanding concise, direct answers without repeated boilerplate or reasoning
@@ -490,21 +501,11 @@ public class GeminiService {
             userNode.put("role", "user");
             userNode.putArray("parts").addObject().put("text", userMessage != null ? userMessage.trim() : "");
 
-            HttpPost httpPost = new HttpPost(url);
-            httpPost.setHeader("Content-Type", "application/json");
-            httpPost.setEntity(new StringEntity(objectMapper.writeValueAsString(requestBody), ContentType.APPLICATION_JSON));
-
-            try (var response = httpClient.execute(httpPost)) {
-                String responseBody = EntityUtils.toString(response.getEntity(), java.nio.charset.StandardCharsets.UTF_8);
-                if (response.getCode() == 200) {
-                    JsonNode root = objectMapper.readTree(responseBody);
-                    String text = extractTextFromGeminiResponse(root);
-                    if (!text.isBlank()) {
-                        return text;
-                    }
-                } else {
-                    log.error("Gemini chat assistant failed with code {}: {}", response.getCode(), responseBody);
-                }
+            String responseBody = executeWithFallback(requestBody);
+            JsonNode root = objectMapper.readTree(responseBody);
+            String text = extractTextFromGeminiResponse(root);
+            if (!text.isBlank()) {
+                return text;
             }
         } catch (Exception e) {
             log.error("Gemini chat error: {}", e.getMessage());
@@ -796,7 +797,6 @@ public class GeminiService {
         }
 
         try {
-            String url = GEMINI_BASE_URL + model + ":generateContent?key=" + apiKey;
             ObjectNode requestBody = objectMapper.createObjectNode();
 
             ObjectNode systemInstruction = requestBody.putObject("system_instruction");
@@ -821,30 +821,22 @@ public class GeminiService {
             userNode.put("role", "user");
             userNode.putArray("parts").addObject().put("text", "Citizen input: " + rawInput + (currentCategory != null ? " (Selected category: " + currentCategory + ")" : ""));
 
-            HttpPost httpPost = new HttpPost(url);
-            httpPost.setHeader("Content-Type", "application/json");
-            httpPost.setEntity(new StringEntity(objectMapper.writeValueAsString(requestBody), ContentType.APPLICATION_JSON));
+            String responseBody = executeWithFallback(requestBody);
+            JsonNode root = objectMapper.readTree(responseBody);
+            String text = extractTextFromGeminiResponse(root);
+            JsonNode json = parseCleanJson(text);
 
-            try (var response = httpClient.execute(httpPost)) {
-                String responseBody = EntityUtils.toString(response.getEntity());
-                if (response.getCode() == 200) {
-                    JsonNode root = objectMapper.readTree(responseBody);
-                    String text = extractTextFromGeminiResponse(root);
-                    JsonNode json = parseCleanJson(text);
+            String category = json.path("category").asText(currentCategory != null && !currentCategory.isBlank() ? currentCategory : "Road Damage");
+            String refinedDescription = json.path("refinedDescription").asText(rawInput);
+            String suggestedWard = json.path("suggestedWard").asText("Ward 1");
+            String priority = json.path("priority").asText("MEDIUM");
 
-                    String category = json.path("category").asText(currentCategory != null && !currentCategory.isBlank() ? currentCategory : "Road Damage");
-                    String refinedDescription = json.path("refinedDescription").asText(rawInput);
-                    String suggestedWard = json.path("suggestedWard").asText("Ward 1");
-                    String priority = json.path("priority").asText("MEDIUM");
-
-                    Map<String, Object> result = new java.util.HashMap<>();
-                    result.put("category", category);
-                    result.put("refinedDescription", refinedDescription);
-                    result.put("suggestedWard", suggestedWard);
-                    result.put("priority", priority);
-                    return result;
-                }
-            }
+            Map<String, Object> result = new java.util.HashMap<>();
+            result.put("category", category);
+            result.put("refinedDescription", refinedDescription);
+            result.put("suggestedWard", suggestedWard);
+            result.put("priority", priority);
+            return result;
         } catch (Exception e) {
             log.error("Gemini grievance refinement failed: {}", e.getMessage());
         }

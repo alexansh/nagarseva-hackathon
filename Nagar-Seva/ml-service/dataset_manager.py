@@ -49,9 +49,9 @@ def generate_sample_dataset(dataset_dir: Path = DATASET_DIR, samples_per_class: 
         "Road_Damage": [(70, 70, 70), (45, 45, 45), (100, 90, 80)], # Asphalt tones
         "Illegal_Dumping": [(140, 100, 60), (90, 120, 60), (180, 80, 60)], # Trash/plastic tones
         "Drainage": [(40, 80, 110), (30, 60, 80), (60, 100, 120)], # Murky water tones
-        "Streetlight": [(30, 35, 50), (220, 200, 100), (20, 20, 30)], # Night/pole/light
+        "Streetlight": [(30, 35, 50), (20, 20, 30), (110, 160, 220), (85, 140, 205), (140, 185, 235)], # Night corridors and daylight blue sky
         "Encroachment": [(160, 130, 90), (180, 100, 50), (120, 120, 120)], # Brick/stall tones
-        "Non_Civic_Spam": [(220, 180, 170), (120, 180, 220), (240, 220, 150)] # Random indoor tones
+        "Non_Civic_Spam": [(220, 180, 170), (240, 220, 150), (210, 190, 200)] # Random indoor wallpapers / domestic tones
     }
 
     random.seed(42)
@@ -97,9 +97,19 @@ def generate_sample_dataset(dataset_dir: Path = DATASET_DIR, samples_per_class: 
                         draw.rectangle([0, 130, 224, 224], fill=(20, 45, 60))
                         draw.line([0, 130, 224, 130], fill=(90, 120, 140), width=4)
                     elif class_name == "Streetlight":
-                        # Draw vertical pole and lantern
-                        draw.rectangle([105, 40, 118, 224], fill=(70, 75, 85))
-                        draw.ellipse([90, 25, 133, 60], fill=(255, 235, 120))
+                        # Support both daytime blue-sky fixtures and night fixtures
+                        is_daytime = bg_color[0] > 70 and bg_color[2] > 180
+                        if is_daytime:
+                            # Daytime: pole, bracket, lamp head with exposed bulb / shattered globe against sky
+                            draw.rectangle([95, 90, 118, 224], fill=(60, 65, 75))
+                            draw.line([106, 90, 155, 45], fill=(60, 65, 75), width=7)
+                            draw.rectangle([135, 40, 165, 60], fill=(50, 55, 65))
+                            draw.ellipse([128, 48, 172, 98], outline=(220, 235, 255), width=2)
+                            draw.ellipse([140, 58, 160, 82], fill=(255, 245, 180))
+                        else:
+                            # Nighttime: vertical pole and glowing lantern
+                            draw.rectangle([105, 40, 118, 224], fill=(70, 75, 85))
+                            draw.ellipse([90, 25, 133, 60], fill=(255, 235, 120))
                     elif class_name == "Encroachment":
                         # Draw street stall / barricade
                         draw.rectangle([40, 80, 184, 170], fill=(180, 60, 40))

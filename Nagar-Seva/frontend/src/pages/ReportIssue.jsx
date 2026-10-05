@@ -335,13 +335,26 @@ export default function ReportIssue() {
     setPhotoVerificationResult(null);
     setManualReviewRequested(false);
     try {
+      const activeCategory = cat !== undefined ? cat : formData.category;
       const response = await apiClient.post('/api/ai/verify-photo', {
-        category: cat || formData.category || 'Road Damage',
-        description: desc || formData.description || 'Civic grievance',
+        category: activeCategory || '',
+        description: desc !== undefined ? desc : (formData.description || 'Civic grievance'),
         photoData: base64String,
       });
       if (response.data) {
         setPhotoVerificationResult(response.data);
+        // Auto-assign category if not selected yet and AI suggested one
+        if (response.data.suggestedCategory && !activeCategory) {
+          const suggested = response.data.suggestedCategory;
+          const matched = categories.find(c =>
+            c.label.toLowerCase() === suggested.toLowerCase() ||
+            suggested.toLowerCase().includes(c.label.toLowerCase()) ||
+            c.label.toLowerCase().includes(suggested.toLowerCase())
+          );
+          if (matched) {
+            setFormData(prev => ({ ...prev, category: matched.label }));
+          }
+        }
       }
     } catch (err) {
       console.warn('AI photo verification error:', err);
@@ -829,6 +842,29 @@ export default function ReportIssue() {
                 <p className="text-emerald-800 dark:text-emerald-300 text-[11px] leading-relaxed">
                   <strong>Detected:</strong> {photoVerificationResult.detectedContent}. {photoVerificationResult.explanation}
                 </p>
+                {photoVerificationResult.suggestedCategory && formData.category !== photoVerificationResult.suggestedCategory && (
+                  <div className="pt-2 mt-1 border-t border-emerald-200/80 dark:border-emerald-800/60 flex items-center justify-between">
+                    <span className="text-[11px] text-emerald-900 dark:text-emerald-200 font-semibold">
+                      💡 Suggested Category: <strong>{photoVerificationResult.suggestedCategory}</strong>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const suggested = photoVerificationResult.suggestedCategory;
+                        const matched = categories.find(c =>
+                          c.label.toLowerCase() === suggested.toLowerCase() ||
+                          suggested.toLowerCase().includes(c.label.toLowerCase()) ||
+                          c.label.toLowerCase().includes(suggested.toLowerCase())
+                        );
+                        const finalCat = matched ? matched.label : suggested;
+                        setFormData(prev => ({ ...prev, category: finalCat }));
+                      }}
+                      className="px-2.5 py-1 bg-emerald-200 hover:bg-emerald-300 dark:bg-emerald-800 text-emerald-900 dark:text-emerald-100 rounded-lg text-[10px] font-bold transition"
+                    >
+                      Apply Category
+                    </button>
+                  </div>
+                )}
               </div>
             )}
 
@@ -859,15 +895,22 @@ export default function ReportIssue() {
                 </div>
 
                 {photoVerificationResult.suggestedCategory && (
-                  <div className="text-[11px] text-amber-900 dark:text-amber-200 font-semibold bg-amber-50 dark:bg-amber-950/50 p-2 rounded-xl border border-amber-200 dark:border-amber-800/60 flex items-center justify-between">
-                    <span>💡 Suggested alternative category: <strong>{photoVerificationResult.suggestedCategory}</strong></span>
+                  <div className="text-[11px] text-amber-900 dark:text-amber-200 font-semibold bg-amber-50 dark:bg-amber-950/50 p-2.5 rounded-xl border border-amber-200 dark:border-amber-800/60 flex items-center justify-between">
+                    <span>💡 Suggested category: <strong>{photoVerificationResult.suggestedCategory}</strong></span>
                     <button
                       type="button"
                       onClick={() => {
-                        setFormData(prev => ({ ...prev, category: photoVerificationResult.suggestedCategory }));
-                        verifyUploadedPhoto(formData.photoData, photoVerificationResult.suggestedCategory, formData.description);
+                        const suggested = photoVerificationResult.suggestedCategory;
+                        const matched = categories.find(c =>
+                          c.label.toLowerCase() === suggested.toLowerCase() ||
+                          suggested.toLowerCase().includes(c.label.toLowerCase()) ||
+                          c.label.toLowerCase().includes(suggested.toLowerCase())
+                        );
+                        const finalCat = matched ? matched.label : suggested;
+                        setFormData(prev => ({ ...prev, category: finalCat }));
+                        verifyUploadedPhoto(formData.photoData, finalCat, formData.description);
                       }}
-                      className="px-2 py-0.5 bg-amber-200 dark:bg-amber-900/80 text-amber-900 dark:text-amber-200 rounded text-[10px] font-bold"
+                      className="px-2.5 py-1 bg-amber-200 dark:bg-amber-900/80 hover:bg-amber-300 dark:hover:bg-amber-800 text-amber-900 dark:text-amber-200 rounded-lg text-[10px] font-bold transition"
                     >
                       Switch to {photoVerificationResult.suggestedCategory}
                     </button>
